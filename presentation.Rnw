@@ -12,19 +12,19 @@
 
 \title{n-gram analysis of biological sequences in R}
 \date{}
-\author{Micha\l{} Burdukiewicz\inst{1}*, Piotr Sobczyk\inst{2}, Ma\l{}gorzata Kotulska\inst{3}, Pawe\l{} Mackiewicz\inst{1}}
+\author{Micha\l{} Burdukiewicz\inst{1}, Piotr Sobczyk\inst{2}, Ma\l{}gorzata Kotulska\inst{3}, Pawe\l{} Mackiewicz\inst{1}}
 \institute{\textsuperscript{1}University of Wroc\l{}aw, Department of Genomics, 
 
 \textsuperscript{2}Wroc\l{}aw University of Science and Technology, Faculty of Pure and Applied Mathematics,
 
-\textsuperscript{3}Wroc\l{}aw University of Science and Technology, Department of Biomedical Engineering,
+\textsuperscript{3}Wroc\l{}aw University of Science and Technology, Department of Biomedical Engineering
 }
 
 \begin{document}
   \maketitle
-  \section{Intro}
+  \section{Introduction}
   
-\begin{frame}{}
+\begin{frame}{Biological sequences}
 <<knitrIntro, echo = FALSE, message=FALSE,warning=FALSE>>=
 source("my_ggplot_theme.R")
 
@@ -36,8 +36,28 @@ library(biogram)
 
 @
 
-Words
+Chains of amino acids (proteins) or nucleotides (RNA or DNA).
 
+% http://www.uniprot.org/uniprot/Q8I0K7
+% https://www.sciencenews.org/article/scorpion-genome-decoded
+Sample protein sequence:
+
+\end{frame}  
+
+\begin{frame}{Amino acids}
+Amino acids may be described using their physicochemical properites.
+\end{frame}
+
+
+\begin{frame}{n-grams}
+n-grams (k-tuples) are vectors of $n$ characters derived from input sequence(s). 
+
+
+\end{frame}
+
+\begin{document}
+  \bibliographystyle{apalike}
+  \bibliography{amyloids}
 \end{frame}
 
   
