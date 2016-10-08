@@ -1,0 +1,44 @@
+\documentclass{beamer}
+\usetheme{metropolis}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{array,booktabs,tabularx}
+\usepackage{epstopdf}
+\usepackage{colortbl, xcolor}
+
+
+\title{n-gram analysis of biological sequences in R}
+\date{}
+\author{Micha\l{} Burdukiewicz\inst{1}*, Piotr Sobczyk\inst{2}, Ma\l{}gorzata Kotulska\inst{3}, Pawe\l{} Mackiewicz\inst{1}}
+\institute{\textsuperscript{1}University of Wroc\l{}aw, Department of Genomics, 
+
+\textsuperscript{2}Wroc\l{}aw University of Science and Technology, Faculty of Pure and Applied Mathematics,
+
+\textsuperscript{3}Wroc\l{}aw University of Science and Technology, Department of Biomedical Engineering,
+}
+
+\begin{document}
+  \maketitle
+  \section{Intro}
+  
+\begin{frame}{}
+<<knitrIntro, echo = FALSE, message=FALSE,warning=FALSE>>=
+source("my_ggplot_theme.R")
+
+
+library(dplyr)
+library(reshape2)
+library(xtable)
+library(biogram)
+
+@
+
+Words
+
+\end{frame}
+
+  
+\end{document}
