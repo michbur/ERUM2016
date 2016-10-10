@@ -8,7 +8,10 @@
 \usepackage{array,booktabs,tabularx}
 \usepackage{epstopdf}
 \usepackage{colortbl, xcolor}
+\usepackage{url}
 
+\setlength\abovecaptionskip{-8pt}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
 
 \title{n-gram analysis of biological sequences in R}
 \date{}
@@ -29,10 +32,11 @@
 source("my_ggplot_theme.R")
 
 
+library(biogram)
+library(seqinr)
 library(dplyr)
 library(reshape2)
-library(xtable)
-library(biogram)
+library(ggplot2)
 
 @
 
@@ -40,13 +44,100 @@ Chains of amino acids (proteins) or nucleotides (RNA or DNA).
 
 % http://www.uniprot.org/uniprot/Q8I0K7
 % https://www.sciencenews.org/article/scorpion-genome-decoded
+\vfill
+
 Sample protein sequence:
 
+\texttt{MKLLLLLIVSASMLIESLVNADGYIKRRDGCKVACLIGNE}
+
+\texttt{GCDKECKAYGGSYGYCWTWGLACWCEGLPDDKTWKSETNT}
+
+\texttt{CGGKK}
 \end{frame}  
 
-\begin{frame}{Amino acids}
+\begin{frame}{Biological sequences}
+
+\begin{figure}
+% CHANGE ME
+%\includegraphics[width=0.6\textwidth]{static_figures/Mesobuthus_martensii.jpg}
+\caption{\tiny \textit{Mesobuthus martensii}. Source: \url{http://www.sciencenews.org}}
+\end{figure}
+
+Toxin produced by \textit{Mesobuthus martensii}:
+
+\texttt{MKLLLLLIVSASMLIESLVNADGYIKRRDGCKVACLIGNE}
+
+\texttt{GCDKECKAYGGSYGYCWTWGLACWCEGLPDDKTWKSETNT}
+
+\texttt{CGGKK}
+\end{frame}  
+
+
+
+\begin{frame}{Biological sequences}
+
+Signal peptide (red): n-terminal amino acid sequence directing proteins to the endomembrane system and next to extracellular localizations.
+
+\texttt{\textcolor{red}{MKLLLLLIVSASMLIESLVNA}DGYIKRRDGCKVACLIGNE}
+
+\texttt{GCDKECKAYGGSYGYCWTWGLACWCEGLPDDKTWKSETNT}
+
+\texttt{CGGKK}
+\end{frame}  
+
+\begin{frame}{Biological sequences}
+<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=5>>=
+seqs <- read.fasta("./data/seqs.fasta", seqtype = "AA")
+seq_df <- lapply(seqs, function(i) i[1L:25]) %>% 
+  do.call(rbind, .) %>% 
+  cbind(name = sub(">", "", sapply(seqs, function(i) attr(i, "Annot"))), .) %>% 
+  data.frame
+
+colnames(seq_df)[-1] <- paste0("P", 1L:25)
+
+mseq_df <- melt(seq_df, id.vars = "name",
+     value.name = "aa", variable.name = "pos") %>% 
+  mutate(aa = factor(aa, levels = a()[-1])) %>% 
+  mutate(pos = factor(sub("P", "", pos), levels = 1L:25)) %>% 
+  mutate(name = factor(gsub(" ", "\n", name))) %>% 
+  mutate(name = relevel(name, "Leiurus\nquinquestriatus\nhebraeus")) %>% 
+  mutate(sig = pos == "22" & name == "Leiurus\nquinquestriatus\nhebraeus") %>% 
+  inner_join(data.frame(aa = a()[-1], hydr = aaprop[2, ]))
+
+ggplot(mseq_df, aes(x = pos, y = name, label = aa, color = aa)) +
+  geom_point(aes(x = pos, y = name, shape = sig), size = 7, color = "red", stroke = 1) +
+  geom_text(size = 5) +
+  scale_x_discrete("Position") + 
+  scale_y_discrete("") +
+  scale_color_discrete(guide = FALSE) +
+  scale_shape_manual(guide = FALSE, values = c(NA, 21)) +
+  my_theme +
+  theme(axis.text = element_text(size=12),
+        panel.grid.major = element_line(color="NA", 
+                                        linetype = "dashed", size = 0.5))
+@
+\end{frame}  
+
+
+\begin{frame}{Properites of amino acids}
+<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=4>>=
+hydr_df <- data.frame(aa = a()[-1], hydr = aaprop[2, ])
+
+ggplot(hydr_df, aes(x = aa, y = hydr)) + 
+  geom_bar(stat = "identity") + 
+  scale_x_discrete("Amino acid") +
+  scale_y_continuous("Hydrophobicity") +
+  my_theme
+@
+
 Amino acids may be described using their physicochemical properites.
+
 \end{frame}
+
+
+\begin{frame}{Biological sequences}
+
+\end{frame}  
 
 
 \begin{frame}{n-grams}
