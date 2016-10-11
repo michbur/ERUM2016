@@ -31,7 +31,6 @@
 <<knitrIntro, echo = FALSE, message=FALSE,warning=FALSE>>=
 source("my_ggplot_theme.R")
 
-
 library(biogram)
 library(seqinr)
 library(dplyr)
@@ -40,7 +39,7 @@ library(ggplot2)
 
 @
 
-Chains of amino acids (proteins) or nucleotides (RNA or DNA).
+Long chains of amino acids (proteins) or nucleotides (RNA or DNA).
 
 % http://www.uniprot.org/uniprot/Q8I0K7
 % https://www.sciencenews.org/article/scorpion-genome-decoded
@@ -48,28 +47,28 @@ Chains of amino acids (proteins) or nucleotides (RNA or DNA).
 
 Sample protein sequence:
 
-\texttt{MKLLLLLIVSASMLIESLVNADGYIKRRDGCKVACLIGNE}
+\texttt{MRKLYCVLLLSAFEFTYMINFGRGQNYWEHPYQKSDVYHP}
 
-\texttt{GCDKECKAYGGSYGYCWTWGLACWCEGLPDDKTWKSETNT}
+\texttt{INEHREHPKEYQYPLHQEHTYQQEDSGEDENTLQHAYPID}
 
-\texttt{CGGKK}
+\texttt{HEGAEPAPQEQNLFSSIEIV...}
+
 \end{frame}  
 
 \begin{frame}{Biological sequences}
 
 \begin{figure}
-% CHANGE ME
-%\includegraphics[width=0.6\textwidth]{static_figures/Mesobuthus_martensii.jpg}
-\caption{\tiny \textit{Mesobuthus martensii}. Source: \url{http://www.sciencenews.org}}
+\includegraphics[width=0.55\textwidth]{static_figures/plasmodium.jpg}
+\caption{\tiny \textit{Plasmodium falciparum}. Source: \url{http://www.protists.ensembl.org}}
 \end{figure}
 
-Toxin produced by \textit{Mesobuthus martensii}:
+Protein of \textit{Plasmodium falciparum}:
 
-\texttt{MKLLLLLIVSASMLIESLVNADGYIKRRDGCKVACLIGNE}
+\texttt{MRKLYCVLLLSAFEFTYMINFGRGQNYWEHPYQKSDVYHP}
 
-\texttt{GCDKECKAYGGSYGYCWTWGLACWCEGLPDDKTWKSETNT}
+\texttt{INEHREHPKEYQYPLHQEHTYQQEDSGEDENTLQHAYPID}
 
-\texttt{CGGKK}
+\texttt{HEGAEPAPQEQNLFSSIEIV...}
 \end{frame}  
 
 
@@ -78,45 +77,55 @@ Toxin produced by \textit{Mesobuthus martensii}:
 
 Signal peptide (red): n-terminal amino acid sequence directing proteins to the endomembrane system and next to extracellular localizations.
 
-\texttt{\textcolor{red}{MKLLLLLIVSASMLIESLVNA}DGYIKRRDGCKVACLIGNE}
+\texttt{\textcolor{red}{MRKLYCVLLLSAFEFTYMINFGRGQ}NYWEHPYQKSDVYHP}
 
-\texttt{GCDKECKAYGGSYGYCWTWGLACWCEGLPDDKTWKSETNT}
+\texttt{INEHREHPKEYQYPLHQEHTYQQEDSGEDENTLQHAYPID}
 
-\texttt{CGGKK}
+\texttt{HEGAEPAPQEQNLFSSIEIV...}
+
+
 \end{frame}  
 
 \begin{frame}{Biological sequences}
 <<echo = FALSE, message=FALSE,warning=FALSE,fig.height=5>>=
 seqs <- read.fasta("./data/seqs.fasta", seqtype = "AA")
-seq_df <- lapply(seqs, function(i) i[1L:25]) %>% 
+seq_df <- lapply(seqs, function(i) i[1L:27]) %>% 
   do.call(rbind, .) %>% 
   cbind(name = sub(">", "", sapply(seqs, function(i) attr(i, "Annot"))), .) %>% 
   data.frame
 
-colnames(seq_df)[-1] <- paste0("P", 1L:25)
+colnames(seq_df)[-1] <- paste0("P", 1L:27)
 
 mseq_df <- melt(seq_df, id.vars = "name",
      value.name = "aa", variable.name = "pos") %>% 
   mutate(aa = factor(aa, levels = a()[-1])) %>% 
-  mutate(pos = factor(sub("P", "", pos), levels = 1L:25)) %>% 
+  mutate(pos = as.numeric(sub("P", "", pos))) %>% 
   mutate(name = factor(gsub(" ", "\n", name))) %>% 
-  mutate(name = relevel(name, "Leiurus\nquinquestriatus\nhebraeus")) %>% 
-  mutate(sig = pos == "22" & name == "Leiurus\nquinquestriatus\nhebraeus") %>% 
+  mutate(name = relevel(name, "Plasmodium\nfalciparum")) %>% 
+  mutate(sig = pos == "25") %>% 
   inner_join(data.frame(aa = a()[-1], hydr = aaprop[2, ]))
 
 ggplot(mseq_df, aes(x = pos, y = name, label = aa, color = aa)) +
-  geom_point(aes(x = pos, y = name, shape = sig), size = 7, color = "red", stroke = 1) +
+  #geom_point(aes(x = pos, y = name, shape = sig), size = 7, color = "red", stroke = 1) +
   geom_text(size = 5) +
-  scale_x_discrete("Position") + 
+  scale_x_continuous("Position") + 
   scale_y_discrete("") +
   scale_color_discrete(guide = FALSE) +
-  scale_shape_manual(guide = FALSE, values = c(NA, 21)) +
+  #scale_shape_manual(guide = FALSE, values = c(NA, 21)) +
+  geom_vline(xintercept = 24.5, color = "red") +
   my_theme +
   theme(axis.text = element_text(size=12),
         panel.grid.major = element_line(color="NA", 
                                         linetype = "dashed", size = 0.5))
 @
 \end{frame}  
+
+
+\begin{frame}{n-grams}
+n-grams (k-tuples) are vectors of $n$ characters derived from input sequence(s). 
+
+
+\end{frame}
 
 
 \begin{frame}{Properites of amino acids}
@@ -137,14 +146,23 @@ Amino acids may be described using their physicochemical properites.
 
 \begin{frame}{Biological sequences}
 
+<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=5>>=
+ggplot(filter(mseq_df, pos != 1), aes(x = pos, y = hydr, group = name)) +
+  geom_point() +
+  geom_line() +
+  #geom_point(aes(x = pos, y = name, shape = sig), size = 7, color = "red", stroke = 1) +
+  scale_x_continuous("Position") + 
+  scale_y_continuous("Hydrophobicity") +
+  scale_color_discrete(guide = FALSE) +
+  geom_smooth() +
+  my_theme +
+  facet_wrap(~ name)
+@
+
+
 \end{frame}  
 
 
-\begin{frame}{n-grams}
-n-grams (k-tuples) are vectors of $n$ characters derived from input sequence(s). 
-
-
-\end{frame}
 
 \begin{document}
   \bibliographystyle{apalike}
