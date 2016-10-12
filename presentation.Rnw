@@ -273,6 +273,18 @@ decode_ngrams(seq2ngrams(sample_seq, 3, aa_v, d = c(1, 2))[1L:8]) %>%
 @
 \end{frame}
 
+\begin{frame}{Proposed model}
+$$
+\textrm{y} \sim \textrm{n-gram}_1 + \textrm{n-gram}_2 + \ldots
+$$
+
+Problems: 
+\begin{itemize}
+\item large number of possible n-grams,
+\item the majority of n-grams is noninformative.
+\end{itemize}
+\end{frame}
+
 \begin{frame}{n-gram counts}
 <<echo = FALSE, message=FALSE,warning=FALSE,fig.height=5,results='asis'>>=
 L <- 5
