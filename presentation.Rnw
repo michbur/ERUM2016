@@ -275,7 +275,7 @@ decode_ngrams(seq2ngrams(sample_seq, 3, aa_v, d = c(1, 2))[1L:8]) %>%
 
 \begin{frame}{Proposed model}
 $$
-\textrm{y} \sim \textrm{n-gram}_1 + \textrm{n-gram}_2 + \ldots
+\textrm{y} \sim \textrm{n-gram}_1 + \textrm{n-gram}_2 + \ldots + \textrm{n-gram}_n
 $$
 
 Problems: 
@@ -564,9 +564,33 @@ ig_plot_ig <- ggplot(data = filter(ig_data, panel == "Information Gain"), mappin
 
 grid.arrange(ig_plot_prob, ig_plot_ig, ig_legend, ncol = 1, heights = c(0.47, 0.47, 0.06))
 @
+\end{frame}
+
+\begin{frame}{QuiPT performance}
+<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=5,results='asis'>>=
+sim_quipt <- read.csv("./data/sim_evaluation50.csv") %>%
+  mutate(motif_len = nchar(gsub(".", "", ngrams2df(as.character(motif))[["ngram"]], fixed = TRUE))) 
+
+tm_pvals <- filter(sim_quipt, criterion == "ig") %>% 
+  select(l_seq, n_seq, p.value, motif_len) %>% 
+  mutate(n_seq = factor(n_seq, levels = 1L:4* 250),
+         l_seq = factor(l_seq)) %>% 
+  mutate(n_seq = factor(n_seq, labels = paste0("Number of sequences: ", levels(n_seq))))
   
 
+ggplot(tm_pvals, aes(x = l_seq, y = p.value, color = as.factor(motif_len))) +
+  geom_boxplot() +
+  facet_wrap( ~ n_seq) +
+  scale_y_continuous("p-value") +
+  scale_x_discrete("Sequence length") +
+  scale_color_manual("", values = c("maroon1", "cadetblue"), labels = c("2-gram", "3-gram")) +
+  my_theme
+
+@
+
+
 \end{frame}
+
 
 \section{Summary and conclusion}
 
