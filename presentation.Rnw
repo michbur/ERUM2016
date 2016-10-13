@@ -10,7 +10,7 @@
 \usepackage{colortbl, xcolor}
 \usepackage{url}
 
-\setlength\abovecaptionskip{-8pt}
+\setlength\abovecaptionskip{-2pt}
 \setbeamertemplate{caption}{\raggedright\insertcaption\par}
 
 \title{n-gram analysis of biological sequences in R}
@@ -461,7 +461,7 @@ PCA analysis of amino acid frequency in signal peptides.
 \begin{frame}{Permutation Test}
   Informative n-grams are usually selected using permutation tests.
 
-During a permutation test we shuffle randomly class labels and compute a defined statistic (e.g. information gain). Values of statistic for permuted data are compared with the value of statistic for original data.
+During a permutation test we shuffle randomly class labels and compute a defined statistic (e.g. information gain). Values of the statistic for permuted data are compared with the value of statistic for original data.
 
 <<echo = FALSE, message=FALSE,warning=FALSE,fig.height=4,results='asis'>>=
 set.seed(1)
@@ -604,12 +604,12 @@ This research was partially funded by the KNOW Consortium and National Science C
 
 \begin{itemize}
 \item Paweł Mackiewicz,
-\item Małgorzata Kotulska.
+\item Małgorzata Kotulska,
 \item \textbf{biogram} package (\url{https://cran.r-project.org/package=biogram}):
 \begin{itemize}
 \small
 \item Piotr Sobczyk,
-\item Chris Lauber,
+\item Chris Lauber.
 \end{itemize}
 \end{itemize}
 
