@@ -147,11 +147,11 @@ Protein of \textit{Plasmodium falciparum}:
 \begin{frame}{Biological sequences}
 
 \begin{figure}
-\includegraphics[width=0.55\textwidth]{static_figures/plasmodium2.jpg}
+\includegraphics[width=0.55\textwidth]{static_figures/plasmodium.jpg}
 \caption{\tiny \textit{Plasmodium falciparum}. Source: \url{http://www.protists.ensembl.org}}
 \end{figure}
 
-Protein of \textit{Plasmodium falciparum}:
+Protein of \textit{Plasmodium falciparum}, malaria-causing parasite:
 
 \texttt{MRKLYCVLLLSAFEFTYMINFGRGQNYWEHPYQKSDVYHP}
 
@@ -174,7 +174,7 @@ Signal peptide (red): n-terminal amino acid sequence directing proteins to the e
 \end{frame}  
 
 \begin{frame}{Biological sequences}
-<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=5>>=
+<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=4.5>>=
 seqs <- read.fasta("./data/seqs.fasta", seqtype = "AA")
 seq_df <- lapply(seqs, function(i) i[1L:27]) %>% 
   do.call(rbind, .) %>% 
@@ -192,19 +192,22 @@ mseq_df <- melt(seq_df, id.vars = "name",
   mutate(sig = pos == "25") %>% 
   inner_join(data.frame(aa = a()[-1], hydr = aaprop[2, ]))
 
-ggplot(mseq_df, aes(x = pos, y = name, label = aa, color = aa)) +
+ggplot(mseq_df, aes(x = pos, y = name, label = aa, fill = aa)) +
   #geom_point(aes(x = pos, y = name, shape = sig), size = 7, color = "red", stroke = 1) +
+  geom_tile() +
   geom_text(size = 5) +
   scale_x_continuous("Position") + 
   scale_y_discrete("") +
-  scale_color_discrete(guide = FALSE) +
+  scale_fill_discrete(guide = FALSE) +
   #scale_shape_manual(guide = FALSE, values = c(NA, 21)) +
-  geom_vline(xintercept = 24.5, color = "red") +
+  geom_vline(xintercept = 24.5, color = "black", size = 2) +
   my_theme +
   theme(axis.text = element_text(size=12),
         panel.grid.major = element_line(color="NA", 
                                         linetype = "dashed", size = 0.5))
 @
+
+Common patterns are hard to identify.
 \end{frame}  
 
 \section{n-grams}
@@ -368,11 +371,22 @@ All packages add their methods to common functions and operators for dense matri
 
 \begin{frame}{slam representation}
 <<echo = FALSE, message=FALSE,warning=FALSE,fig.height=5,results='asis'>>=
-ggplot(slam_summary, aes(x = n_seq, y = size, color = method)) +
+get_mb <- function(x) {
+  y <- x
+  class(y) <- "object_size"
+  format(y, "Mb")
+}
+
+slam_summary <- mutate(slam_summary, size_mb = get_mb(size)) %>% 
+  group_by(method, ngrams) %>% 
+  mutate(size_mb = ifelse(size == max(size), size_mb, ""))
+
+ggplot(slam_summary, aes(x = n_seq, y = size, color = method, label = size_mb)) +
   geom_point() +
+  geom_text(hjust = 1.1) +
   scale_x_continuous("Number of sequences") +
   scale_y_continuous("Size [bytes]") +
-  scale_color_manual("Matrix type", values = c("cadetblue", "maroon1")) +
+  scale_color_manual("Matrix type", values = c("cadetblue", "maroon1"), labels = c("slam", "base")) +
   facet_wrap(~ ngrams, ncol = 1, scales = "free_y") +
   my_theme
 @
@@ -464,12 +478,12 @@ I & D, E, H, K, N, Q, R \\
 \end{tabular}
 \end{table}
 \end{frame}
-
+ 
 \begin{frame}{Reduction of the alphabet}
-<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=4.5,results='asis'>>=
+<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=4.1,results='asis'>>=
 print(p2)
 @
-PCA analysis of amino acid frequency in signal peptides.
+PCA analysis of amino acid frequency in signal peptides. Reduced amino acid alphabet groups together signal peptides belonging to \textit{Plasmodiidae} and other eukaryotes.
 \end{frame}
 
 \section{Filtering n-grams}
