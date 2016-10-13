@@ -100,6 +100,8 @@ dat_nondeg <- do_pca(freq_nondeg)
 @
 \textit{biogram}: the \textbf{R} package for the n-gram analysis of biological sequences.
 
+n-grams: features describing the sequence.
+
 biogram workflow:
 \begin{enumerate}
 \item Extract n-grams.
@@ -142,6 +144,21 @@ Protein of \textit{Plasmodium falciparum}:
 \texttt{HEGAEPAPQEQNLFSSIEIV...}
 \end{frame}  
 
+\begin{frame}{Biological sequences}
+
+\begin{figure}
+\includegraphics[width=0.55\textwidth]{static_figures/plasmodium2.jpg}
+\caption{\tiny \textit{Plasmodium falciparum}. Source: \url{http://www.protists.ensembl.org}}
+\end{figure}
+
+Protein of \textit{Plasmodium falciparum}:
+
+\texttt{MRKLYCVLLLSAFEFTYMINFGRGQNYWEHPYQKSDVYHP}
+
+\texttt{INEHREHPKEYQYPLHQEHTYQQEDSGEDENTLQHAYPID}
+
+\texttt{HEGAEPAPQEQNLFSSIEIV...}
+\end{frame}  
 
 
 \begin{frame}{Biological sequences}
@@ -548,7 +565,7 @@ ig_legend <- g_legend(ggplot(data = ig_data, mapping = aes(x = x, y = y, color =
 
 ig_plot_prob <- ggplot(data = filter(ig_data, panel == "Probability"), mapping = aes(x = x, y = y)) + 
   geom_freqpoly(stat = "identity") +
-  xlab("Number of cases with feature=1 and target=1") + 
+  xlab("Number of cases with n-gram=1 and target=1") + 
   ylab("Probability") +
   geom_vline(xintercept = 25, color = "maroon1", size = 1.5) +
   geom_vline(xintercept = 41, color = "cadetblue", size = 1.5) +
@@ -566,8 +583,8 @@ grid.arrange(ig_plot_prob, ig_plot_ig, ig_legend, ncol = 1, heights = c(0.47, 0.
 @
 \end{frame}
 
-\begin{frame}{QuiPT performance}
-<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=5,results='asis'>>=
+\begin{frame}{Sensitivity of QuiPT}
+<<echo = FALSE, message=FALSE,warning=FALSE,fig.height=4.5,results='asis'>>=
 sim_quipt <- read.csv("./data/sim_evaluation50.csv") %>%
   mutate(motif_len = nchar(gsub(".", "", ngrams2df(as.character(motif))[["ngram"]], fixed = TRUE))) 
 
@@ -577,7 +594,6 @@ tm_pvals <- filter(sim_quipt, criterion == "ig") %>%
          l_seq = factor(l_seq)) %>% 
   mutate(n_seq = factor(n_seq, labels = paste0("Number of sequences: ", levels(n_seq))))
   
-
 ggplot(tm_pvals, aes(x = l_seq, y = p.value, color = as.factor(motif_len))) +
   geom_boxplot() +
   facet_wrap( ~ n_seq) +
@@ -585,9 +601,9 @@ ggplot(tm_pvals, aes(x = l_seq, y = p.value, color = as.factor(motif_len))) +
   scale_x_discrete("Sequence length") +
   scale_color_manual("", values = c("maroon1", "cadetblue"), labels = c("2-gram", "3-gram")) +
   my_theme
-
 @
 
+QuiPT works best for large data sets of short sequences.
 
 \end{frame}
 
@@ -600,7 +616,7 @@ ggplot(tm_pvals, aes(x = l_seq, y = p.value, color = as.factor(motif_len))) +
 biogram workflow:
 \begin{enumerate}
 \item Extract n-grams (\texttt{count\_ngrams()} and \texttt{count\_multigrams()}).
-\item Change an alphabet (\texttt{reduce\_alphabet()} and \texttt{calc\_ed()}).
+\item Change an alphabet (\texttt{calc\_ed()} and \texttt{calc\_si()}).
 \item Filter n-grams (\texttt{test\_features()}).
 \end{enumerate}
 \end{frame} 
@@ -638,12 +654,5 @@ This research was partially funded by the KNOW Consortium and National Science C
 \end{itemize}
 
 \end{frame}
-
-
-\begin{document}
-  \bibliographystyle{apalike}
-  \bibliography{amyloids}
-\end{frame}
-
-  
+ 
 \end{document}
